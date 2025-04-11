@@ -1,6 +1,8 @@
 package com.aquainsight.monitoring.controller;
 
+import com.aquainsight.monitoring.model.WaterQualityMetric;
 import com.aquainsight.monitoring.model.WaterSample;
+import com.aquainsight.monitoring.model.WaterSampleResponseDTO;
 import com.aquainsight.monitoring.service.QualityMetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,15 +37,14 @@ public class AssistantQueryController {
             return ResponseEntity.ok("📍 Kindly specify the location code in your query.");
         }
 
-        List<WaterSample> dataRecords = qualityMetricsService.fetchSamplesByLocation(locationCode);
+        List<WaterSampleResponseDTO> dataRecords = qualityMetricsService.fetchSamplesByLocation(locationCode);
 
         if (dataRecords.isEmpty()) {
             return ResponseEntity.ok("⚠️ No water data available for the specified location.");
         }
 
-        WaterSample latestEntry = dataRecords.get(dataRecords.size() - 1);
-        Map<String, Object> metrics = latestEntry.getQualityMetrics();
-
+        WaterSampleResponseDTO latestEntry = dataRecords.get(dataRecords.size() - 1);
+        Map<String, Double> metrics = latestEntry.getQualityMetrics();
         if (metrics == null || metrics.isEmpty()) {
             return ResponseEntity.ok("⚠️ No parameters found in the latest water data.");
         }

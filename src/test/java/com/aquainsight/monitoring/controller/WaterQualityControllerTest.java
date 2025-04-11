@@ -2,8 +2,14 @@ package com.aquainsight.monitoring.controller;
 
 
 
+import com.aquainsight.monitoring.model.WaterQualityMetric;
 import com.aquainsight.monitoring.model.WaterSample;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import com.aquainsight.monitoring.model.WaterSampleResponseDTO;
 import com.aquainsight.monitoring.service.QualityMetricsService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -41,32 +45,34 @@ public class WaterQualityControllerTest {
     }
 
     @Test
-    public void testIngestData() throws Exception {
-        WaterSample waterQuality = new WaterSample();
-        waterQuality.setLocationCode("village1");
-        waterQuality.setDateCollected(LocalDate.now());
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("pH", 7.0);
-        parameters.put("chlorine", 0.5);
-        waterQuality.setQualityMetrics(parameters); // Set parameters as a Map
+    public void testSubmitMetrics() throws Exception {
+        WaterSampleResponseDTO responseDTO = new WaterSampleResponseDTO();
+        responseDTO.setId(1L);
+        responseDTO.setLocationCode("village1");
+        responseDTO.setDateCollected(LocalDate.parse("2024-01-01"));
 
-        Mockito.when(waterQualityService.recordSample(Mockito.any())).thenReturn(waterQuality);
+        Map<String, Double> metricsMap = new HashMap<>();
+        metricsMap.put("pH", 7.0);
+        metricsMap.put("chlorine", 0.8);
+        responseDTO.setQualityMetrics(metricsMap);
 
-        // Construct the request body with parameters as an object
+        Mockito.when(waterQualityService.recordSample(Mockito.any())).thenReturn(responseDTO);
+
         String requestBody = "{\n" +
                 "  \"locationCode\": \"village1\",\n" +
                 "  \"dateCollected\": \"2024-01-01\",\n" +
                 "  \"qualityMetrics\": {\n" +
                 "    \"pH\": 7.0,\n" +
-                "    \"chlorine\": 0.8,\n" +
-                "    \"colour\": \"clear\"\n" +
+                "    \"chlorine\": 0.8\n" +
                 "  }\n" +
-                "}\n";
+                "}";
 
-        mockMvc.perform(post("/api/water-quality")
+        mockMvc.perform(post("/api/metrics")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string(Matchers.containsString("village1")))
+                .andExpect(content().string(Matchers.containsString("pH")))
+                .andExpect(content().string(Matchers.containsString("7.0")));
     }
-
 }

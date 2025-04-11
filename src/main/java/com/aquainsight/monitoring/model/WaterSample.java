@@ -1,12 +1,14 @@
 package com.aquainsight.monitoring.model;
 
 
-import com.aquainsight.monitoring.service.MapToJsonConverter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "water_quality_records")
@@ -20,7 +22,7 @@ public class WaterSample {
 
     private LocalDate dateCollected;
 
-    @Convert(converter = MapToJsonConverter.class)
-    private Map<String, Object> qualityMetrics;
+    @OneToMany(mappedBy = "sample", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WaterQualityMetric> qualityMetrics = new ArrayList<>();
 
 }
