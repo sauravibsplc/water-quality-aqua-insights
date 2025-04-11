@@ -77,7 +77,7 @@ curl --location 'http://localhost:8080/api/water-quality' \
 
 ## Chatbot URL
 
-- **Chatbot Interface**: `http://localhost:8080/chatbot`
+- **Chatbot Interface**: `http://localhost:8080/assistant`
 - Sample Image added on the Project Source Folder
 
 ## Build Instructions
@@ -106,7 +106,7 @@ curl --location 'http://localhost:8080/api/water-quality' \
    ```
 
 4. **Access the chatbot**:
-   Open your web browser and navigate to `http://localhost:8080/chatbot`.
+   Open your web browser and navigate to `http://localhost:8080/assistant`.
 
 ## Testing
 
@@ -116,11 +116,6 @@ Unit tests can be executed using the following command:
 mvn test
 ```
 
-## Future Enhancements
-
-- Integration with external water quality data sources.
-- User authentication and role management.
-- Advanced natural language processing for improved chatbot interactions.
 
 ## License
 
